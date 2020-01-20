@@ -5,7 +5,7 @@ Below are example requests you can make to this application server.
 ### List All People
 
 ```
-GET: http://localhost:8080/person
+GET: http://localhost:8080/people
 ```
 
 Returns a list of all people stored in the cassandra database.
@@ -13,7 +13,7 @@ Returns a list of all people stored in the cassandra database.
 ### List All People Named Musk
 
 ```
-GET: http://localhost:8080/person/Musk
+GET: http://localhost:8080/people/Musk
 ```
 
 Returns a list of all people with name "Musk".
@@ -21,7 +21,7 @@ Returns a list of all people with name "Musk".
 ### Create a New Person
 
 ```
-POST: localhost:8080/person
+POST: localhost:8080/people
 
 {
 	"key": {

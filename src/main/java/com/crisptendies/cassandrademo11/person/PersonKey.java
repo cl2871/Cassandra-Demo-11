@@ -7,6 +7,7 @@ import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
 
 // Composite Primary Key
@@ -22,7 +23,7 @@ public class PersonKey implements Serializable {
     private LocalDate dateOfBirth;
 
     // Cluster column applied second
-    @PrimaryKeyColumn(name = "person_id", ordinal = 1, ordering = Ordering.DESCENDING)
+    @PrimaryKeyColumn(name = "id", ordinal = 1, ordering = Ordering.DESCENDING)
     private UUID id;
 
     public PersonKey(String fullName, LocalDate dateOfBirth, UUID id) {
@@ -53,5 +54,20 @@ public class PersonKey implements Serializable {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PersonKey personKey = (PersonKey) o;
+        return Objects.equals(fullName, personKey.fullName) &&
+                Objects.equals(dateOfBirth, personKey.dateOfBirth) &&
+                Objects.equals(id, personKey.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fullName, dateOfBirth, id);
     }
 }
