@@ -16,6 +16,12 @@ The `dateOfBirth` property is the first clustering key, which is used for sortin
 
 The `id` property is the second clustering key, which is also used for sorting but has less priority that `dateOfBirth`.
 
+#### Data Modeling Note
+
+As a UUID, the `id` property could have just been the primary key for the Person class.
+For a production application, having the additional partition and clustering columns help for data sharding
+and supporting more efficient queries.
+
 ### [PersonRepository.java](../src/main/java/com/crisptendies/cassandrademo11/person/PersonRepository.java)
 
 This defines a Spring `@Repository` that is used for performing database actions against the `people` table.
@@ -27,4 +33,4 @@ These methods are written in a pattern that Spring can recognize.
 ### [PersonController.java](../src/main/java/com/crisptendies/cassandrademo11/person/PersonController.java)
 
 This is a `@RestController` class used for interacting with the application.
-A user can save and retrieve Person objects by sending REST requests.
+A user can save and retrieve Person objects by sending REST requests to the `/people` endpoint.
