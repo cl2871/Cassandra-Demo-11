@@ -4,6 +4,7 @@
 
 This is a simple Spring Boot application for connecting to a Cassandra database. 
 This particular project uses Java 11 and Gradle.
+This project has been updated to use reactive libraries (project reactor and webflux).
 
 Project dependencies can be found in the [build.gradle](./build.gradle)
 
