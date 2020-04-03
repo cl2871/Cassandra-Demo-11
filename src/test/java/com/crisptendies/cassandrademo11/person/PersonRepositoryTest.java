@@ -4,12 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 // Integration test; uses db defined in the test application.properties
 @SpringBootTest
@@ -32,56 +32,66 @@ class PersonRepositoryTest {
 
     @BeforeEach
     private void setUpEachTest() {
-        personRepository.deleteAll();
-        personRepository.save(personOne);
-        personRepository.save(personTwo);
-        personRepository.save(personThree);
+        personRepository.deleteAll().block();
+        personRepository.save(personOne).block();
+        personRepository.save(personTwo).block();
+        personRepository.save(personThree).block();
     }
 
     @Test
     public void testFindByKeyFullName() {
-        List<Person> people = personRepository.findByKeyFullName("Will");
-        assertThat(people)
-                .extracting("key.id")
-                .contains(idOne, idThree)
-                .doesNotContain(idTwo);
+        StepVerifier.create(personRepository.findByKeyFullName("Will"))
+                .expectNext(personThree, personOne)
+                .verifyComplete();
     }
 
     @Test
     public void testFindByKeyFullNameAndKeyDateOfBirthGreaterThan() {
-        List<Person> people = personRepository.findByKeyFullNameAndKeyDateOfBirthGreaterThan(
+        Flux<Person> people = personRepository.findByKeyFullNameAndKeyDateOfBirthGreaterThan(
                         "Will",
                         LocalDate.of(1970, 1, 1));
 
-        assertThat(people)
-                .extracting("key.id")
-                .contains(idOne)
-                .doesNotContain(idTwo, idThree);
+        StepVerifier.create(people)
+                .expectNext(personOne)
+                .verifyComplete();
     }
 
     @Test
     public void testFindByKeyFullNameAndKeyDateOfBirthAndKeyId() {
-        List<Person> people = personRepository.findByKeyFullNameAndKeyDateOfBirthAndKeyId(
+        Flux<Person> people = personRepository.findByKeyFullNameAndKeyDateOfBirthAndKeyId(
                 "Carlton",
                 LocalDate.of(1980, 1, 1),
                 idTwo);
 
-        assertThat(people)
-                .extracting("key.id")
-                .contains(idTwo)
-                .doesNotContain(idOne, idThree);
+        StepVerifier.create(people)
+                .expectNext(personTwo)
+                .verifyComplete();
     }
 
     @Test
     public void testDelete() {
-        personRepository.delete(personOne);
-        List<Person> people = personRepository.findByKeyFullNameAndKeyDateOfBirthAndKeyId(
+        personRepository.delete(personOne).block();
+        Flux<Person> people = personRepository.findByKeyFullNameAndKeyDateOfBirthAndKeyId(
                 "Will",
                 LocalDate.of(1990, 1, 1),
                 idOne);
 
-        assertThat(people)
-                .extracting("key.id")
-                .doesNotContain(idOne);
+        StepVerifier.create(people).verifyComplete();
+    }
+
+    @Test
+    public void testDeleteById() {
+        PersonKey personKey = new PersonKey(
+                "Will",
+                LocalDate.parse("1990-01-01", DateTimeFormatter.ISO_LOCAL_DATE),
+                idOne);
+        personRepository.deleteById(personKey).block();
+
+        Flux<Person> people = personRepository.findByKeyFullNameAndKeyDateOfBirthAndKeyId(
+                "Will",
+                LocalDate.parse("1990-01-01", DateTimeFormatter.ISO_LOCAL_DATE),
+                idOne);
+
+        StepVerifier.create(people).verifyComplete();
     }
 }

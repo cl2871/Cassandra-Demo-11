@@ -34,3 +34,9 @@ POST: localhost:8080/people
 ```
 
 Note: the above is a request body in JSON format
+
+### Delete a Person
+
+```
+DELETE: localhost:8080/people/Musk/1999-12-12/f4e7e29a-c42b-4d8f-b788-d4482e97d66c
+```

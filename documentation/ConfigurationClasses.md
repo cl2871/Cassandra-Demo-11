@@ -40,7 +40,7 @@ Notes:
 This is a `@Configuration` file that is used by Spring Data.
 This reads the properties from the application.properties file.
 
-This utilizes the `@EnableCassandraRepositories` annotation to enable the `PersonRepository` class.
+This utilizes the `@EnableReactiveCassandraRepositories` annotation to enable the `PersonRepository` class.
 
 Note that `getMetricsEnabled()` is set to false. 
 If you have JMX Reporting enabled you can set this to true.

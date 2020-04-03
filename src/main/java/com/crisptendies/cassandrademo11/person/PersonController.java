@@ -1,43 +1,43 @@
 package com.crisptendies.cassandrademo11.person;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/people")
 public class PersonController {
-
     private final PersonRepository personRepository;
 
-    @Autowired
-    public PersonController(PersonRepository personRepository) {
-        this.personRepository = personRepository;
-    }
-
     @GetMapping
-    public List<Person> getAllPeople() {
+    public Flux<Person> getAllPeople() {
         return personRepository.findAll();
     }
 
     @GetMapping("/{fullName}")
-    public List<Person> getPeopleByFullName(@PathVariable String fullName) {
+    public Flux<Person> getPeopleByFullName(@PathVariable String fullName) {
         return personRepository.findByKeyFullName(fullName);
     }
 
     @PostMapping
-    public Person savePerson(@RequestBody Person person) {
+    public Mono<Person> savePerson(@RequestBody Person person) {
         return personRepository.save(person);
     }
 
     @DeleteMapping("/{fullName}/{dateOfBirth}/{id}")
-    public void deletePerson(
+    public Mono<Void> deletePerson(
             @PathVariable String fullName,
             @PathVariable String dateOfBirth,
             @PathVariable UUID id) {
-        this.personRepository.deleteById(new PersonKey(fullName, LocalDate.parse(dateOfBirth), id));
+        // Parse date string in YYYY-MM-DD format
+        LocalDate localDate = LocalDate.parse(dateOfBirth, DateTimeFormatter.ISO_LOCAL_DATE);
+        PersonKey personKey = new PersonKey(fullName, localDate, id);
+        return personRepository.deleteById(personKey);
     }
 }
